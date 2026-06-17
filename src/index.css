@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    background-color: #f1ede4;
+    color: #1c1c1c;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+  }
+
+  /* Faint paper grain across the whole canvas — keeps the bone background
+     from reading as flat digital fill. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  ::selection {
+    background: rgba(176, 144, 79, 0.24);
+  }
+}
+
+@layer components {
+  /* Letter-spaced small-caps eyebrow label used throughout. */
+  .eyebrow {
+    @apply font-sans text-[10.5px] font-medium uppercase tracking-label text-brass;
+  }
+
+  .eyebrow-muted {
+    @apply font-sans text-[10.5px] font-medium uppercase tracking-label text-slatey;
+  }
+
+  .hairline {
+    @apply border-hairline;
+  }
+
+  /* The document "sheet" — a faintly elevated leaf on the desk. */
+  .sheet {
+    background-color: #fcfaf5;
+    box-shadow: 0 30px 80px -45px rgba(14, 27, 46, 0.45),
+      0 1px 0 0 rgba(14, 27, 46, 0.05);
+  }
+
+  .figure {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+  }
+
+  .rule-gold {
+    background: linear-gradient(
+      to right,
+      transparent,
+      rgba(176, 144, 79, 0.55),
+      transparent
+    );
+  }
+}
+
+@layer utilities {
+  .reveal {
+    animation: reveal 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none !important;
+  }
+}
+
+/* ---- React Flow theming to match the dossier ---- */
+.react-flow__attribution {
+  display: none;
+}
+.react-flow__edge-path {
+  stroke: #b0904f;
+  stroke-opacity: 0.5;
+}
+.react-flow__node {
+  cursor: default;
+}
+.react-flow__handle {
+  opacity: 0;
+}
+
+/* ---- Print: only the summary sheet survives ---- */
+@media print {
+  @page {
+    margin: 14mm;
+  }
+  body {
+    background: #ffffff !important;
+  }
+  body::before {
+    display: none !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+  .print-break-avoid {
+    break-inside: avoid;
+  }
+}
