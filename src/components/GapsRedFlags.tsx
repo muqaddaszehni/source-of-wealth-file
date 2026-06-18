@@ -1,4 +1,5 @@
-import { redFlags, type Priority } from '../data/client'
+import { type Priority } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
 
 const prio: Record<Priority, { label: string; text: string; border: string; bg: string }> = {
   high: { label: 'High priority', text: 'text-ochre', border: 'border-ochre/50', bg: 'bg-ochre' },
@@ -7,6 +8,7 @@ const prio: Record<Priority, { label: string; text: string; border: string; bg: 
 }
 
 export default function GapsRedFlags() {
+  const { redFlags } = useActiveDossier()
   return (
     <div className="grid gap-px overflow-hidden border border-hairline bg-hairline md:grid-cols-3">
       {redFlags.map((f, i) => {

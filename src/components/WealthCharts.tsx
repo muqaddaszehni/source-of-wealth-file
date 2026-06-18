@@ -10,13 +10,8 @@ import {
   Pie,
   Cell,
 } from 'recharts'
-import {
-  wealthCurve,
-  holdings,
-  completenessBreakdown,
-  client,
-  type DocStatus,
-} from '../data/client'
+import { type DocStatus } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
 import { fmtM } from '../lib/format'
 
 const axisFont = {
@@ -50,6 +45,7 @@ function SliceTooltip({ active, payload }: any) {
 }
 
 function WealthCurve() {
+  const { wealthCurve } = useActiveDossier()
   return (
     <div className="border border-hairline bg-paper p-6">
       <div className="eyebrow-muted text-[9px]">Wealth accumulation</div>
@@ -102,6 +98,7 @@ function WealthCurve() {
 }
 
 function Allocation() {
+  const { holdings } = useActiveDossier()
   const total = holdings.reduce((s, h) => s + h.valueM, 0)
   return (
     <div className="border border-hairline bg-paper p-6">
@@ -174,6 +171,7 @@ const barColor: Record<DocStatus, string> = {
 }
 
 function CompletenessBar() {
+  const { completenessBreakdown, profile: client } = useActiveDossier()
   return (
     <div className="border border-hairline bg-paper p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">

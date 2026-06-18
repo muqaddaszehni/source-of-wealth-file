@@ -1,12 +1,5 @@
-import {
-  client,
-  events,
-  checks,
-  redFlags,
-  holdings,
-  disclaimerLine,
-  type Priority,
-} from '../data/client'
+import { disclaimerLine, type Priority } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
 import { fmtM, fmtFull } from '../lib/format'
 import StatusPill from './StatusPill'
 import { CrestIcon, PrinterIcon, ArrowRight } from './Icons'
@@ -18,6 +11,7 @@ const prioLabel: Record<Priority, string> = {
 }
 
 export default function SummaryView({ onClose }: { onClose: () => void }) {
+  const { profile: client, events, checks, redFlags, holdings } = useActiveDossier()
   const passed = checks.filter((c) => c.status === 'pass').length
   const flagged = checks.length - passed
   const total = holdings.reduce((s, h) => s + h.valueM, 0)
@@ -68,7 +62,7 @@ export default function SummaryView({ onClose }: { onClose: () => void }) {
           <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
             <div>
               <h1 className="font-serif text-[40px] leading-none text-navy">
-                Mr. Chen Wai-Lun
+                {client.name}
               </h1>
               <p className="mt-2 font-sans text-[11.5px] tracking-wide2 text-slatey">
                 {client.residence} · Relationship since {client.relationshipSince} ·{' '}

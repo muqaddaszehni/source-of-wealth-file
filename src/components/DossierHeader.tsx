@@ -1,5 +1,5 @@
-import { client } from '../data/client'
 import { fmtM, fmtFull } from '../lib/format'
+import { useActiveDossier } from '../state/DossierContext'
 import CompletenessGauge from './CompletenessGauge'
 
 function Meta({ label, value }: { label: string; value: string }) {
@@ -12,6 +12,7 @@ function Meta({ label, value }: { label: string; value: string }) {
 }
 
 export default function DossierHeader() {
+  const client = useActiveDossier().profile
   return (
     <section className="px-7 pt-9 md:px-12 md:pt-12">
       <div className="flex flex-col gap-9 lg:flex-row lg:items-start lg:justify-between">
@@ -20,17 +21,19 @@ export default function DossierHeader() {
           <div className="eyebrow">Client Dossier</div>
           <div className="mt-3 flex items-end gap-4">
             <h1 className="font-serif text-[52px] leading-[0.95] text-navy md:text-[64px]">
-              Mr. Chen Wai-Lun
+              {client.name}
             </h1>
-            <span className="hidden pb-2 font-serif text-[26px] text-brass md:inline">
-              {client.romanisation}
-            </span>
+            {client.romanisation && (
+              <span className="hidden pb-2 font-serif text-[26px] text-brass md:inline">
+                {client.romanisation}
+              </span>
+            )}
           </div>
-          <p className="mt-4 max-w-xl font-sans text-[13px] leading-relaxed text-charcoal/75">
-            Founder of a Hong Kong logistics enterprise; principal wealth realised on the 2014
-            sale of a majority stake, since reinvested across Hong Kong and Singapore real estate
-            and a diversified portfolio.
-          </p>
+          {client.summary && (
+            <p className="mt-4 max-w-xl font-sans text-[13px] leading-relaxed text-charcoal/75">
+              {client.summary}
+            </p>
+          )}
         </div>
 
         {/* Headline figures */}

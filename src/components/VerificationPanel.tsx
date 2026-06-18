@@ -1,7 +1,8 @@
-import { checks } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
 import { CheckIcon, FlagIcon } from './Icons'
 
 export default function VerificationPanel() {
+  const { checks } = useActiveDossier()
   const passed = checks.filter((c) => c.status === 'pass').length
   const flagged = checks.length - passed
 

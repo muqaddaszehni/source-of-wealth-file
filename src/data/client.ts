@@ -4,6 +4,8 @@
  *  All figures are illustrative and expressed in USD millions.
  * ------------------------------------------------------------------ */
 
+import { MarkerType, type Node, type Edge } from '@xyflow/react'
+
 export type DocStatus = 'verified' | 'needs-verification' | 'missing'
 export type CheckStatus = 'pass' | 'flag'
 export type Priority = 'high' | 'medium' | 'low'
@@ -65,12 +67,13 @@ export interface ClientProfile {
   preparedOn: string
   totalWealthM: number
   completeness: number
+  summary?: string // one-line dossier headline shown under the client name
 }
 
 /* ---------------------------- Profile ---------------------------- */
 
 export const client: ClientProfile = {
-  name: 'Chen Wai-Lun',
+  name: 'Mr. Chen Wai-Lun',
   romanisation: '陳偉倫',
   fileRef: 'SOW-2026-0417 / Rev. 3',
   bookingCentre: 'Hong Kong SAR',
@@ -82,6 +85,8 @@ export const client: ClientProfile = {
   preparedOn: '17 June 2026',
   totalWealthM: 312.4,
   completeness: 78,
+  summary:
+    'Founder of a Hong Kong logistics enterprise; principal wealth realised on the 2014 sale of a majority stake, since reinvested across Hong Kong and Singapore real estate and a diversified portfolio.',
 }
 
 /* ------------------------- Wealth origin ------------------------- */
@@ -351,3 +356,85 @@ export interface FlowNodeData extends Record<string, unknown> {
 
 export const disclaimerLine =
   'Decision-support only — does not replace compliance review.'
+
+/* ------------------ Wealth-flow diagram model ------------------ */
+
+export type SwfFlowNode = Node<FlowNodeData, 'swf'>
+
+export interface FlowModel {
+  nodes: SwfFlowNode[]
+  edges: Edge[]
+}
+
+const flowEdge = (
+  id: string,
+  source: string,
+  target: string,
+  label?: string,
+): Edge => ({
+  id,
+  source,
+  target,
+  type: 'smoothstep',
+  label,
+  labelStyle: { fill: '#8B8579', fontSize: 9, fontFamily: 'Inter', letterSpacing: '0.06em' },
+  labelBgStyle: { fill: '#FCFAF5' },
+  labelBgPadding: [4, 2],
+  markerEnd: { type: MarkerType.ArrowClosed, color: '#B0904F', width: 14, height: 14 },
+  style: { stroke: '#B0904F', strokeOpacity: 0.5 },
+})
+
+// Hand-authored flow for Mr. Chen — preserved verbatim; generated clients
+// derive their diagram via buildFlowModel().
+const chenFlowNodes: SwfFlowNode[] = [
+  { id: 'savings', type: 'swf', position: { x: 0, y: 40 }, data: { title: 'Savings & family loan', sub: '1992 · founder capital', tone: 'source' } },
+  { id: 'inherit', type: 'swf', position: { x: 0, y: 360 }, data: { title: 'Inheritance', sub: '2008 · paternal estate', value: 'US$ 12.0M', tone: 'source' } },
+  { id: 'engine', type: 'swf', position: { x: 268, y: 190 }, data: { title: 'Pacific Meridian Logistics', sub: 'Founded 1992 · sold 2014', tone: 'engine' } },
+  { id: 'sale', type: 'swf', position: { x: 536, y: 70 }, data: { title: 'Sale of 68% stake', sub: '2014 · Orient Global Freight', value: 'US$ 182.0M', tone: 'event' } },
+  { id: 'retain', type: 'swf', position: { x: 536, y: 320 }, data: { title: 'Retained 32% stake', sub: 'Dividends · current value', value: 'US$ 46.0M', tone: 'event' } },
+  { id: 're', type: 'swf', position: { x: 824, y: 0 }, data: { title: 'Real estate — HK & SG', value: 'US$ 138.0M', tone: 'holding' } },
+  { id: 'sec', type: 'swf', position: { x: 824, y: 118 }, data: { title: 'Listed securities & funds', value: 'US$ 74.0M', tone: 'holding' } },
+  { id: 'fi', type: 'swf', position: { x: 824, y: 236 }, data: { title: 'Fixed income', value: 'US$ 38.4M', tone: 'holding' } },
+  { id: 'cash', type: 'swf', position: { x: 824, y: 354 }, data: { title: 'Cash & equivalents', value: 'US$ 16.0M', tone: 'holding' } },
+]
+
+const chenFlowEdges: Edge[] = [
+  flowEdge('e1', 'savings', 'engine', 'founds'),
+  flowEdge('e2', 'engine', 'sale'),
+  flowEdge('e3', 'engine', 'retain'),
+  flowEdge('e4', 'sale', 're', 'reinvest'),
+  flowEdge('e5', 'sale', 'sec'),
+  flowEdge('e6', 'sale', 'fi'),
+  flowEdge('e7', 'sale', 'cash'),
+  flowEdge('e8', 'retain', 'sec', 'dividends'),
+  flowEdge('e9', 'inherit', 'sec'),
+  flowEdge('e10', 'inherit', 're'),
+]
+
+export const chenFlow: FlowModel = { nodes: chenFlowNodes, edges: chenFlowEdges }
+
+/* ----------------------------- Dossier ----------------------------- */
+
+export interface Dossier {
+  id: string
+  profile: ClientProfile
+  events: WealthEvent[]
+  checks: VerificationCheck[]
+  redFlags: RedFlag[]
+  holdings: Holding[]
+  wealthCurve: WealthPoint[]
+  completenessBreakdown: CompletenessSlice[]
+  flow?: FlowModel
+}
+
+export const chenDossier: Dossier = {
+  id: 'chen',
+  profile: client,
+  events,
+  checks,
+  redFlags,
+  holdings,
+  wealthCurve,
+  completenessBreakdown,
+  flow: chenFlow,
+}

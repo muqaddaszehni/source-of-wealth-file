@@ -1,7 +1,8 @@
-import { client } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
 import { CrestIcon } from './Icons'
 
 export default function Masthead() {
+  const client = useActiveDossier().profile
   return (
     <div className="bg-navy px-7 py-5 text-bone md:px-12 md:py-6">
       <div className="flex items-center justify-between gap-4">

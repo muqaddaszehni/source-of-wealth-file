@@ -4,13 +4,13 @@ import {
   Background,
   Handle,
   Position,
-  MarkerType,
   type Node,
-  type Edge,
   type NodeProps,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import type { FlowNodeData } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
+import { buildFlowModel } from '../lib/buildFlow'
 
 type SwfNode = Node<FlowNodeData, 'swf'>
 
@@ -68,44 +68,6 @@ function FlowCard({ data }: NodeProps<SwfNode>) {
 
 const nodeTypes = { swf: FlowCard }
 
-const nodes: SwfNode[] = [
-  { id: 'savings', type: 'swf', position: { x: 0, y: 40 }, data: { title: 'Savings & family loan', sub: '1992 · founder capital', tone: 'source' } },
-  { id: 'inherit', type: 'swf', position: { x: 0, y: 360 }, data: { title: 'Inheritance', sub: '2008 · paternal estate', value: 'US$ 12.0M', tone: 'source' } },
-  { id: 'engine', type: 'swf', position: { x: 268, y: 190 }, data: { title: 'Pacific Meridian Logistics', sub: 'Founded 1992 · sold 2014', tone: 'engine' } },
-  { id: 'sale', type: 'swf', position: { x: 536, y: 70 }, data: { title: 'Sale of 68% stake', sub: '2014 · Orient Global Freight', value: 'US$ 182.0M', tone: 'event' } },
-  { id: 'retain', type: 'swf', position: { x: 536, y: 320 }, data: { title: 'Retained 32% stake', sub: 'Dividends · current value', value: 'US$ 46.0M', tone: 'event' } },
-  { id: 're', type: 'swf', position: { x: 824, y: 0 }, data: { title: 'Real estate — HK & SG', value: 'US$ 138.0M', tone: 'holding' } },
-  { id: 'sec', type: 'swf', position: { x: 824, y: 118 }, data: { title: 'Listed securities & funds', value: 'US$ 74.0M', tone: 'holding' } },
-  { id: 'fi', type: 'swf', position: { x: 824, y: 236 }, data: { title: 'Fixed income', value: 'US$ 38.4M', tone: 'holding' } },
-  { id: 'cash', type: 'swf', position: { x: 824, y: 354 }, data: { title: 'Cash & equivalents', value: 'US$ 16.0M', tone: 'holding' } },
-]
-
-const edge = (id: string, source: string, target: string, label?: string): Edge => ({
-  id,
-  source,
-  target,
-  type: 'smoothstep',
-  label,
-  labelStyle: { fill: '#8B8579', fontSize: 9, fontFamily: 'Inter', letterSpacing: '0.06em' },
-  labelBgStyle: { fill: '#FCFAF5' },
-  labelBgPadding: [4, 2],
-  markerEnd: { type: MarkerType.ArrowClosed, color: '#B0904F', width: 14, height: 14 },
-  style: { stroke: '#B0904F', strokeOpacity: 0.5 },
-})
-
-const edges: Edge[] = [
-  edge('e1', 'savings', 'engine', 'founds'),
-  edge('e2', 'engine', 'sale'),
-  edge('e3', 'engine', 'retain'),
-  edge('e4', 'sale', 're', 'reinvest'),
-  edge('e5', 'sale', 'sec'),
-  edge('e6', 'sale', 'fi'),
-  edge('e7', 'sale', 'cash'),
-  edge('e8', 'retain', 'sec', 'dividends'),
-  edge('e9', 'inherit', 'sec'),
-  edge('e10', 'inherit', 're'),
-]
-
 function LegendDot({ className, label }: { className: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -116,8 +78,10 @@ function LegendDot({ className, label }: { className: string; label: string }) {
 }
 
 export default function WealthFlowDiagram() {
-  const memoNodes = useMemo(() => nodes, [])
-  const memoEdges = useMemo(() => edges, [])
+  const dossier = useActiveDossier()
+  const flow = useMemo(() => dossier.flow ?? buildFlowModel(dossier), [dossier])
+  const memoNodes = flow.nodes
+  const memoEdges = flow.edges
 
   return (
     <div className="border border-hairline bg-paper">

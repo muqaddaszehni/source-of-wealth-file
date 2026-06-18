@@ -1,4 +1,5 @@
-import { events, type WealthEvent, type SupportingDoc } from '../data/client'
+import { type WealthEvent, type SupportingDoc } from '../data/client'
+import { useActiveDossier } from '../state/DossierContext'
 import StatusPill from './StatusPill'
 import { DocIcon } from './Icons'
 
@@ -78,6 +79,7 @@ function EventRow({ event, index }: { event: WealthEvent; index: number }) {
 }
 
 export default function WealthTimeline() {
+  const { events } = useActiveDossier()
   return (
     <div className="relative">
       {/* continuous rail */}
